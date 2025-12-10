@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>CY 2.0 – Unified Predictive · Digital Twin · Gate</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { background: #05070a; color: #f5f5f5; }
+    a { color: inherit; text-decoration: none; }
+    .app { display: flex; flex-direction: column; height: 100vh; }
+
+    .topbar {
+      height: 56px;
+      background: #0f1117;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      border-bottom: 1px solid #22252f;
+    }
+    .logo { font-weight: 700; font-size: 18px; margin-right: 32px; }
+
+    .tabs { display: flex; gap: 8px; }
+    .tab {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: #12151f;
+      font-size: 12px;
+      color: #b6bed5;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .tab.active {
+      background: #2563eb;
+      color: #f9fafb;
+      border-color: #1d4ed8;
+    }
+
+    .spacer { flex: 1; }
+    .search {
+      background: #111827;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: #6b7280;
+      min-width: 220px;
+    }
+
+    .shell {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #05070a;
+      border-right: 1px solid #111827;
+      padding: 16px 12px;
+    }
+    .sidebar-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    .menu-item {
+      display: block;
+      font-size: 13px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      color: #d1d5db;
+      cursor: pointer;
+      margin-bottom: 2px;
+    }
+    .menu-item.active { background: #111827; }
+
+    .content {
+      flex: 1;
+      padding: 16px 20px;
+      display: flex;
+      gap: 16px;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .panel {
+      background: #05070a;
+      border-radius: 10px;
+      border: 1px solid #111827;
+    }
+    .panel-header {
+      padding: 10px 12px 6px 12px;
+      border-bottom: 1px solid #111827;
+      font-size: 12px;
+      color: #9ca3af;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-header strong { color: #e5e7eb; }
+    .panel-body { padding: 10px 12px 12px 12px; font-size: 12px; color: #d1d5db; }
+    .btn {
+      border-radius: 6px;
+      border: 1px solid #1f2933;
+      padding: 5px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      background: #0b1120;
+      color: #e5e7eb;
+    }
+    .btn.secondary {
+      background: transparent;
+      color: #9ca3af;
+    }
+
+    /* Predictive layout */
+    .filters-panel { width: 260px; display: flex; flex-direction: column; gap: 10px; }
+    .filter-section { margin-bottom: 10px; }
+    .filter-title {
+      font-size: 11px;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 6px;
+    }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
+    .chip {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid #1f2933;
+      color: #9ca3af;
+    }
+    .chip.active {
+      border-color: #2563eb;
+      background: #111827;
+      color: #e5e7eb;
+    }
+    .field-label { font-size: 11px; color: #9ca3af; margin-top: 4px; margin-bottom: 2px; }
+    .field-input {
+      width: 100%;
+      background: #05070a;
+      border-radius: 6px;
+      border: 1px solid #1f2933;
+      padding: 4px 6px;
+      font-size: 11px;
+      color: #e5e7eb;
+    }
+    .slider-row {
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .slider-label { font-size: 11px; color: #9ca3af; }
+    .slider-bar {
+      flex: 1;
+      height: 4px;
+      background: #111827;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .slider-fill {
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+    }
+    .slider-value { font-size: 11px; color: #e5e7eb; min-width: 24px; text-align: right; }
+    .filters-footer { display: flex; gap: 8px; margin-top: 4px; }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+      min-height: 0;
+    }
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .kpi-card {
+      background: #05070a;
+      border-radius: 10px;
+      border: 1px solid #111827;
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+    .kpi-label { color: #9ca3af; margin-bottom: 2px; }
+    .kpi-value { font-size: 14px; font-weight: 600; color: #e5e7eb; }
+    .kpi-delta { font-size: 11px; color: #22c55e; }
+
+    .table-wrapper {
+      flex: 1;
+      min-height: 0;
+      background: #05070a;
+      border-radius: 10px;
+      border: 1px solid #111827;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 8px 10px;
+      border-bottom: 1px solid #111827;
+      font-size: 12px;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .table-subtitle { font-size: 11px; color: #9ca3af; }
+    .table-body {
+      flex: 1;
+      overflow: auto;
+      font-size: 11px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+    thead { background: #050816; position: sticky; top: 0; z-index: 2; }
+    th, td {
+      text-align: left;
+      padding: 6px 8px;
+      border-bottom: 1px solid #0b1220;
+      white-space: nowrap;
+    }
+    th { font-weight: 500; color: #9ca3af; font-size: 11px; }
+    tr:nth-child(even) { background: #050810; }
+
+    .priority-bar {
+      width: 60px;
+      height: 4px;
+      border-radius: 999px;
+      background: #111827;
+      overflow: hidden;
+    }
+    .priority-fill {
+      height: 100%;
+      width: 74%;
+      background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+    }
+    .table-footer {
+      padding: 6px 10px;
+      border-top: 1px solid #111827;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .actions-right { display: flex; gap: 8px; }
+
+    /* Digital Twin */
+    .twin-grid {
+      flex: 1;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1.5fr) 260px;
+      grid-template-rows: minmax(0, 1fr) 40px;
+      gap: 12px;
+      min-width: 0;
+      min-height: 0;
+    }
+    .panel-header-sub { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+    .layer-list { margin-top: 8px; font-size: 12px; }
+    .layer-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .layer-toggle {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid #374151;
+      background: #05070a;
+    }
+    .layer-toggle.on {
+      background: #22c55e;
+      border-color: #22c55e;
+    }
+    .map-panel {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+      background: #05070a;
+      border-radius: 10px;
+      border: 1px solid #111827;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #e5e7eb;
+      margin-bottom: 8px;
+    }
+    .map-body {
+      flex: 1;
+      border-radius: 8px;
+      border: 1px dashed #1f2933;
+      background: radial-gradient(circle at 10% 20%, #111827 0, #020617 55%);
+      position: relative;
+      overflow: hidden;
+    }
+    .yard-block {
+      position: absolute;
+      border-radius: 4px;
+      border: 1px solid #1f2933;
+      background: #020617;
+      font-size: 10px;
+      color: #9ca3af;
+      padding: 2px 4px;
+    }
+    .yard-block.hotspot {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 1px #ef4444;
+    }
+    .time-slider-panel {
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+    .time-buttons { display: flex; gap: 6px; }
+    .time-btn {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #1f2933;
+      background: #020617;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .time-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #f9fafb;
+    }
+
+    .kpi-panel {
+      background: #05070a;
+      border-radius: 10px;
+      border: 1px solid #111827;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11px;
+    }
+    .kpi-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .kpi-item-label { color: #9ca3af; }
+    .kpi-item-value { color: #e5e7eb; font-weight: 600; }
+    .kpi-item-note { color: #22c55e; font-size: 10px; }
+
+    .housekeeping-panel {
+      background: #05070a;
+      border-radius: 10px;
+      border: 1px solid #111827;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      font-size: 11px;
+    }
+    .hk-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .hk-table-wrapper { flex: 1; overflow: auto; }
+    .hk-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    .hk-table th, .hk-table td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #0b1120;
+      white-space: nowrap;
+      text-align: left;
+    }
+    .hk-table th { color: #9ca3af; font-weight: 500; }
+    .hk-table tr:nth-child(even) { background: #050810; }
+
+    /* Gate */
+    .gate-content-inner {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+      min-height: 0;
+    }
+    .gate-top-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+    .id-panel { background:#05070a; border-radius:10px; border:1px solid #111827; }
+    .id-header {
+      padding:8px 12px;
+      border-bottom:1px solid #111827;
+      font-size:12px;
+      color:#e5e7eb;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .id-body {
+      padding:10px 12px 12px 12px;
+      font-size:11px;
+      color:#d1d5db;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:8px 12px;
+    }
+
+    .badge-ok {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:2px 6px;
+      border-radius:999px;
+      border:1px solid #16a34a;
+      font-size:10px;
+      color:#bbf7d0;
+    }
+    .suggest-row {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+    .suggest-panel {
+      background:#05070a;
+      border-radius:10px;
+      border:1px solid #111827;
+      display:flex;
+      flex-direction:column;
+    }
+    .suggest-header {
+      padding:8px 10px;
+      border-bottom:1px solid #111827;
+      font-size:11px;
+      color:#e5e7eb;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .suggest-body { padding:8px 10px 10px 10px; font-size:11px; color:#d1d5db; }
+    .radio-tag {
+      width:14px;
+      height:14px;
+      border-radius:999px;
+      border:2px solid #4b5563;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-right:4px;
+      cursor:pointer;
+    }
+    .radio-tag-inner {
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:transparent;
+    }
+    .suggest-panel.selected { border-color:#2563eb; box-shadow:0 0 0 1px #2563eb; }
+    .suggest-panel.selected .radio-tag { border-color:#2563eb; }
+    .suggest-panel.selected .radio-tag-inner { background:#2563eb; }
+    .pos-line { margin-top:4px; }
+    .pos-label { color:#9ca3af; }
+    .pos-value { color:#e5e7eb; font-weight:600; }
+    .delta-line { margin-top:4px; font-size:10px; color:#22c55e; }
+
+    .gate-footer {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:11px;
+      margin-top:4px;
+    }
+    .footer-left { color:#9ca3af; }
+    .footer-right { display:flex; gap:8px; }
+
+    /* View containers */
+    .view { display: none; flex: 1; min-height: 0; }
+    .view.active { display: flex; }
+
+  </style>
+  <script>
+    function showView(name) {
+      const views = document.querySelectorAll('.view');
+      views.forEach(v => v.classList.remove('active'));
+      const target = document.getElementById('view-' + name);
+      if (target) target.classList.add('active');
+
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(t => t.classList.remove('active'));
+      const activeTab = document.getElementById('tab-' + name);
+      if (activeTab) activeTab.classList.add('active');
+
+      const menus = document.querySelectorAll('.menu-item');
+      menus.forEach(m => m.classList.remove('active'));
+      if (name === 'predictive') {
+        document.getElementById('menu-workqueue').classList.add('active');
+      } else if (name === 'digital') {
+        document.getElementById('menu-yard').classList.add('active');
+      } else if (name === 'gate') {
+        document.getElementById('menu-gate').classList.add('active');
+      }
+    }
+
+    function selectTime(label) {
+      const buttons = document.querySelectorAll('.time-btn');
+      buttons.forEach(btn => {
+        if (btn.dataset.label === label) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      const target = document.getElementById('twin-current-time');
+      if (target) target.textContent = label;
+    }
+
+    function selectSuggest(type) {
+      const staticPanel = document.getElementById('suggest-static');
+      const predPanel = document.getElementById('suggest-predictive');
+      if (type === 'static') {
+        staticPanel.classList.add('selected');
+        predPanel.classList.remove('selected');
+      } else {
+        predPanel.classList.add('selected');
+        staticPanel.classList.remove('selected');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      showView('predictive');
+    });
+  </script>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo">CY 2.0</div>
+    <div class="tabs">
+      <div id="tab-predictive" class="tab" onclick="showView('predictive')">Planejamento &amp; Predictive</div>
+      <div id="tab-digital" class="tab" onclick="showView('digital')">Digital Twin</div>
+      <div id="tab-gate" class="tab" onclick="showView('gate')">Gate Control 2.0</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="search">Buscar (contêiner, placa, NF...)</div>
+  </div>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-title">Módulos</div>
+      <div class="menu-item" onclick="showView('predictive')">Dashboard</div>
+      <div id="menu-gate" class="menu-item" onclick="showView('gate')">Gate</div>
+      <div class="menu-item" onclick="showView('predictive')">Unitização</div>
+      <div id="menu-yard" class="menu-item" onclick="showView('digital')">Pátio / Digital Twin</div>
+      <div id="menu-workqueue" class="menu-item" onclick="showView('predictive')">Work Queue</div>
+      <div class="menu-item" onclick="showView('digital')">Avarias</div>
+      <div class="menu-item" onclick="showView('digital')">Relatórios</div>
+    </aside>
+
+    <!-- PREDICTIVE VIEW -->
+    <main id="view-predictive" class="content view">
+      <div class="panel filters-panel">
+        <div class="panel-header">
+          <span><strong>Filtros &amp; Critérios</strong></span>
+        </div>
+        <div class="panel-body">
+          <div class="filter-section">
+            <div class="filter-title">Contexto do pátio</div>
+            <div class="field-label">Site · Pátio</div>
+            <select class="field-input">
+              <option>CLIA Santos · Pátio Exportação</option>
+            </select>
+            <div class="field-label">Quadras / Pilhas</div>
+            <div class="chip-row">
+              <div class="chip active">C1</div>
+              <div class="chip active">C2</div>
+              <div class="chip">D1</div>
+              <div class="chip">D2</div>
+            </div>
+            <div class="chip-row" style="margin-top:4px;">
+              <div class="chip active">Cheios</div>
+              <div class="chip">Vazios</div>
+              <div class="chip">Ambos</div>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <div class="filter-title">Perfil das unidades</div>
+            <div class="chip-row">
+              <div class="chip active">Importação</div>
+              <div class="chip">Exportação</div>
+              <div class="chip">DTA</div>
+              <div class="chip">Cabotagem</div>
+            </div>
+            <div class="chip-row" style="margin-top:4px;">
+              <div class="chip active">Liberado</div>
+              <div class="chip">Pendência</div>
+              <div class="chip">Canal vermelho</div>
+            </div>
+            <div class="field-label">Janela de retirada</div>
+            <div class="chip-row">
+              <div class="chip active">Hoje</div>
+              <div class="chip">+1 dia</div>
+              <div class="chip">+2 dias</div>
+              <div class="chip">+3+ dias</div>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <div class="filter-title">Equipamento &amp; restrições</div>
+            <div class="field-label">Tipo de equipamento</div>
+            <select class="field-input">
+              <option>Reach Stacker</option>
+              <option>Empty Handler</option>
+              <option>Empilhadeira</option>
+            </select>
+            <div class="field-label">Altura alvo / Profundidade</div>
+            <div class="chip-row">
+              <div class="chip">Até 3 tiers</div>
+              <div class="chip active">Até 4 tiers</div>
+              <div class="chip">Até 5 tiers</div>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <div class="filter-title">Pesos &amp; penalidades</div>
+            <div class="slider-row">
+              <div class="slider-label">Antiguidade</div>
+              <div class="slider-bar"><div class="slider-fill"></div></div>
+              <div class="slider-value">80</div>
+            </div>
+            <div class="slider-row">
+              <div class="slider-label">Cut-off / janela</div>
+              <div class="slider-bar"><div class="slider-fill" style="width:70%;"></div></div>
+              <div class="slider-value">70</div>
+            </div>
+            <div class="slider-row">
+              <div class="slider-label">Rehandles</div>
+              <div class="slider-bar"><div class="slider-fill" style="width:90%;"></div></div>
+              <div class="slider-value">90</div>
+            </div>
+            <div class="slider-row">
+              <div class="slider-label">Bloqueio de corredor</div>
+              <div class="slider-bar"><div class="slider-fill" style="width:60%;"></div></div>
+              <div class="slider-value">60</div>
+            </div>
+          </div>
+
+          <div class="filters-footer">
+            <div class="btn">Aplicar filtros</div>
+            <div class="btn secondary">Resetar</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main">
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-label">Rehandles (próx. 24h)</div>
+            <div class="kpi-value">214 → 146</div>
+            <div class="kpi-delta">-31,8% com plano preditivo</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Unidades críticas em posição ruim</div>
+            <div class="kpi-value">86 → 27</div>
+            <div class="kpi-delta">-68% após aplicação</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Corredores em risco de bloqueio</div>
+            <div class="kpi-value">7 → 2</div>
+            <div class="kpi-delta">Plano alivia gargalos</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Distância média por movimento</div>
+            <div class="kpi-value">142 m</div>
+            <div class="kpi-delta">mantida dentro do alvo</div>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <div class="table-header">
+            <div>
+              Sugestões preditivas de housekeeping
+              <div class="table-subtitle">Baseadas em antiguidade, janela de retirada, status aduaneiro e risco de bloqueio</div>
+            </div>
+            <div class="actions-right">
+              <div class="btn secondary" onclick="showView('digital')">Ver plano no Digital Twin</div>
+            </div>
+          </div>
+          <div class="table-body">
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" /></th>
+                  <th>Contêiner</th>
+                  <th>ISO</th>
+                  <th>Cat.</th>
+                  <th>Operação</th>
+                  <th>Idade (dias)</th>
+                  <th>Janela / Cut-off</th>
+                  <th>Status aduaneiro</th>
+                  <th>PriorityScore</th>
+                  <th>Posição atual</th>
+                  <th>Posição sugerida</th>
+                  <th>Δ Rehandles</th>
+                  <th>Distância est.</th>
+                  <th>Restrições</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" checked /></td>
+                  <td>MSKU1234567</td>
+                  <td>22G1</td>
+                  <td>Cheio</td>
+                  <td>Importação</td>
+                  <td>9</td>
+                  <td>Hoje 18:00</td>
+                  <td>Liberado</td>
+                  <td>
+                    92
+                    <div class="priority-bar"><div class="priority-fill" style="width:92%;"></div></div>
+                  </td>
+                  <td>C1 · B04 · R02 · T04</td>
+                  <td>D1 · B01 · R01 · T02</td>
+                  <td>-3 moves</td>
+                  <td>57 m</td>
+                  <td>IMDG</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" checked /></td>
+                  <td>CMAU7654321</td>
+                  <td>45G1</td>
+                  <td>Cheio</td>
+                  <td>Importação</td>
+                  <td>7</td>
+                  <td>Amanhã 12:00</td>
+                  <td>Liberado</td>
+                  <td>
+                    84
+                    <div class="priority-bar"><div class="priority-fill" style="width:84%;"></div></div>
+                  </td>
+                  <td>C2 · B06 · R03 · T05</td>
+                  <td>C2 · B02 · R01 · T02</td>
+                  <td>-2 moves</td>
+                  <td>43 m</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" /></td>
+                  <td>MSCU9988776</td>
+                  <td>22R1</td>
+                  <td>Cheio</td>
+                  <td>Importação</td>
+                  <td>5</td>
+                  <td>Hoje 23:00</td>
+                  <td>Pendência</td>
+                  <td>
+                    78
+                    <div class="priority-bar"><div class="priority-fill" style="width:78%;"></div></div>
+                  </td>
+                  <td>C1 · B02 · R01 · T03</td>
+                  <td>D2 · B03 · R01 · T02</td>
+                  <td>-1 move</td>
+                  <td>65 m</td>
+                  <td>Reefer</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <div>Selecionados: 2 contêineres</div>
+            <div class="actions-right">
+              <div class="btn secondary">Aprovar selecionados</div>
+              <div class="btn">Enviar selecionados para Work Queue</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- DIGITAL TWIN VIEW -->
+    <main id="view-digital" class="content view">
+      <div class="twin-grid">
+        <div class="panel" style="grid-column:1/2; grid-row:1/2; display:flex; flex-direction:column;">
+          <div class="panel-header">
+            <div>
+              <strong>Cenário &amp; Camadas</strong>
+              <div class="panel-header-sub">CY Digital Twin – pátio em movimento</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="field-label">Cenário atual</div>
+            <div class="btn secondary" style="margin-top:4px; margin-bottom:6px;">Salvar como versão de simulação</div>
+            <div class="field-label">Cenários salvos</div>
+            <div class="chip-row">
+              <div class="chip">Turno anterior</div>
+              <div class="chip">Pico gate manhã</div>
+              <div class="chip active">Plano Predictive D-1</div>
+            </div>
+
+            <div class="field-label" style="margin-top:10px;">Camadas</div>
+            <div class="layer-list">
+              <div class="layer-item">
+                <div class="layer-toggle on"></div>
+                <span>Ocupação por área</span>
+              </div>
+              <div class="layer-item">
+                <div class="layer-toggle on"></div>
+                <span>Tipo de unidade (cheio/vazio/reefer)</span>
+              </div>
+              <div class="layer-item">
+                <div class="layer-toggle"></div>
+                <span>Clientes / Serviços</span>
+              </div>
+              <div class="layer-item">
+                <div class="layer-toggle on"></div>
+                <span>Tarefas em execução</span>
+              </div>
+              <div class="layer-item">
+                <div class="layer-toggle"></div>
+                <span>Tarefas planejadas</span>
+              </div>
+              <div class="layer-item">
+                <div class="layer-toggle on"></div>
+                <span>Hotspots de bloqueio</span>
+              </div>
+            </div>
+
+            <div class="field-label" style="margin-top:10px;">Alertas</div>
+            <ul style="margin-left:14px; margin-top:4px; font-size:11px; color:#e5e7eb;">
+              <li>2 quadras com risco de bloqueio nas próximas 4h</li>
+              <li>Reefer clusterado em área não dedicada</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="map-panel">
+          <div class="map-header">
+            <div>
+              <div style="font-weight:600;">Mapa do pátio – visão 2D</div>
+              <div style="font-size:11px; color:#9ca3af;">Quadras, bays, rows, tiers · Cenário em: <span id="twin-current-time">Agora</span></div>
+            </div>
+            <div class="btn secondary" onclick="showView('predictive')">Ver sugestões de Predictive</div>
+          </div>
+          <div class="map-body">
+            <div class="yard-block" style="top:16px; left:24px; width:120px; height:52px;">C1 – Importação</div>
+            <div class="yard-block hotspot" style="top:80px; left:40px; width:140px; height:52px;">C2 – Importação (hotspot)</div>
+            <div class="yard-block" style="top:26px; right:40px; width:140px; height:52px;">D1 – Exportação</div>
+            <div class="yard-block" style="bottom:28px; left:120px; width:120px; height:48px;">Vazios</div>
+            <div class="yard-block" style="bottom:40px; right:80px; width:120px; height:48px;">Reefers</div>
+          </div>
+        </div>
+
+        <div class="kpi-panel" style="grid-column:3/4; grid-row:1/2;">
+          <div class="panel-header" style="border-bottom:none; padding:0 0 4px 0;">
+            <strong>KPIs do cenário</strong>
+          </div>
+          <div class="kpi-item-row">
+            <div class="kpi-item-label">Ocupação total</div>
+            <div class="kpi-item-value">76%</div>
+          </div>
+          <div class="kpi-item-row">
+            <div class="kpi-item-label">Rehandles estimados (24h)</div>
+            <div class="kpi-item-value">146</div>
+          </div>
+          <div class="kpi-item-note">↓ 31,8% vs. cenário “sem plano”</div>
+          <div class="kpi-item-row" style="margin-top:4px;">
+            <div class="kpi-item-label">Movimentos de housekeeping</div>
+            <div class="kpi-item-value">54</div>
+          </div>
+          <div class="kpi-item-row">
+            <div class="kpi-item-label">Corredores com risco de bloqueio</div>
+            <div class="kpi-item-value">2</div>
+          </div>
+          <div class="kpi-item-row">
+            <div class="kpi-item-label">Unidades críticas em posição ruim</div>
+            <div class="kpi-item-value">27</div>
+          </div>
+          <div class="kpi-item-row">
+            <div class="kpi-item-label">Tempo estimado de execução</div>
+            <div class="kpi-item-value">3h 40min</div>
+          </div>
+          <div style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
+            <div class="btn secondary" onclick="showView('predictive')">Ajustar parâmetros de Predictive</div>
+            <div class="btn">Gerar plano de trabalho (Work Queue)</div>
+          </div>
+        </div>
+
+        <div class="housekeeping-panel" style="grid-column:3/4; grid-row:2/3;">
+          <div class="hk-header">
+            <div>
+              <div style="font-weight:600;">Plano de housekeeping</div>
+              <div style="font-size:11px; color:#9ca3af;">Vinculado ao cenário “Plano Predictive D-1”</div>
+            </div>
+            <div class="btn secondary" style="padding:3px 8px;">Exportar</div>
+          </div>
+          <div class="hk-table-wrapper">
+            <table class="hk-table">
+              <thead>
+                <tr>
+                  <th>Contêiner</th>
+                  <th>De</th>
+                  <th>Para</th>
+                  <th>Origem</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>MSKU1234567</td>
+                  <td>C1·B04·R02·T04</td>
+                  <td>D1·B01·R01·T02</td>
+                  <td>Predictive</td>
+                  <td>Planejado</td>
+                </tr>
+                <tr>
+                  <td>CMAU7654321</td>
+                  <td>C2·B06·R03·T05</td>
+                  <td>C2·B02·R01·T02</td>
+                  <td>Predictive</td>
+                  <td>Planejado</td>
+                </tr>
+                <tr>
+                  <td>MSCU9988776</td>
+                  <td>C1·B02·R01·T03</td>
+                  <td>D2·B03·R01·T02</td>
+                  <td>Manual</td>
+                  <td>Em execução</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="time-slider-panel">
+          <div style="font-size:11px; color:#9ca3af;">Linha do tempo do cenário</div>
+          <div class="time-buttons">
+            <button class="time-btn active" data-label="Agora" onclick="selectTime('Agora')">Agora</button>
+            <button class="time-btn" data-label="+1h" onclick="selectTime('+1h')">+1h</button>
+            <button class="time-btn" data-label="+2h" onclick="selectTime('+2h')">+2h</button>
+            <button class="time-btn" data-label="+4h" onclick="selectTime('+4h')">+4h</button>
+            <button class="time-btn" data-label="Fim do turno" onclick="selectTime('Fim do turno')">Fim do turno</button>
+            <button class="time-btn" data-label="+1 dia" onclick="selectTime('+1 dia')">+1 dia</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- GATE VIEW -->
+    <main id="view-gate" class="content view">
+      <div class="gate-content-inner">
+        <div class="gate-top-row">
+          <div class="id-panel">
+            <div class="id-header">
+              <span>Identificação do veículo e contêiner</span>
+              <span style="font-size:11px; color:#9ca3af;">Gate IN · Portão 03</span>
+            </div>
+            <div class="id-body">
+              <div>
+                <div class="field-label">Placa</div>
+                <input class="field-input" value="RTE-4A29" />
+              </div>
+              <div>
+                <div class="field-label">Contêiner</div>
+                <input class="field-input" value="MSKU1234567" />
+              </div>
+              <div>
+                <div class="field-label">Tipo</div>
+                <input class="field-input" value="22G1 · 20' Cheio" />
+              </div>
+              <div>
+                <div class="field-label">Armador / Cliente</div>
+                <input class="field-input" value="MAERSK / ABC LOG" />
+              </div>
+              <div>
+                <div class="field-label">Documentos vinculados</div>
+                <input class="field-input" value="NF 34567 · DTA 90876" />
+              </div>
+              <div>
+                <div class="field-label">Peso declarado × balança</div>
+                <input class="field-input" value="23.500 kg × 23.320 kg" />
+              </div>
+              <div>
+                <div class="field-label">Status aduaneiro</div>
+                <div class="badge-ok">Liberado</div>
+              </div>
+              <div>
+                <div class="field-label">Checagem de lacre</div>
+                <div class="badge-ok">Lacre OK</div>
+              </div>
+              <div>
+                <div class="field-label">Observações</div>
+                <input class="field-input" value="Sem restrições adicionais" />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <strong>Resumo crítico</strong>
+                <div style="font-size:11px; color:#9ca3af;">Tudo que o gate precisa saber antes de liberar</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <ul style="margin-left:14px; line-height:1.4;">
+                <li>Janela de entrega ainda dentro do horário (cut-off DTA em 3h12).</li>
+                <li>Sem pendências aduaneiras registradas no último polling.</li>
+                <li>Peso compatível entre documento e balança (diferença: 180 kg).</li>
+                <li>Plano de pátio disponível: regras estáticas × plano preditivo.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="suggest-row">
+          <div class="suggest-panel selected" id="suggest-static" onclick="selectSuggest('static')">
+            <div class="suggest-header">
+              <div>
+                <span>
+                  <span class="radio-tag"><span class="radio-tag-inner"></span></span>
+                  Sugestão por regra (Smart Decking)
+                </span>
+              </div>
+              <span style="font-size:10px; color:#9ca3af;">Baseado em regras estáticas</span>
+            </div>
+            <div class="suggest-body">
+              <div class="pos-line">
+                <span class="pos-label">Posição sugerida:</span>
+                <span class="pos-value">C1 · B04 · R02 · T04</span>
+              </div>
+              <div class="pos-line">
+                <span class="pos-label">Motivo:</span>
+                <span>Área designada para importação cheia · serviço MAERSK.</span>
+              </div>
+              <div class="pos-line">
+                <span class="pos-label">Regra aplicada:</span>
+                <span>IMP · 20' · Cheio · Armador MAERSK → C1/C2</span>
+              </div>
+              <div class="delta-line">
+                Posição aderente ao desenho atual de pátio, sem considerar previsões futuras.
+              </div>
+            </div>
+          </div>
+
+          <div class="suggest-panel" id="suggest-predictive" onclick="selectSuggest('predictive')">
+            <div class="suggest-header">
+              <div>
+                <span>
+                  <span class="radio-tag"><span class="radio-tag-inner"></span></span>
+                  Sugestão preditiva (Predictive Decking)
+                </span>
+              </div>
+              <span style="font-size:10px; color:#9ca3af;">Otimizada para rehandles e janela</span>
+            </div>
+            <div class="suggest-body">
+              <div class="pos-line">
+                <span class="pos-label">Posição sugerida:</span>
+                <span class="pos-value">D1 · B01 · R01 · T02</span>
+              </div>
+              <div class="pos-line">
+                <span class="pos-label">PriorityScore:</span>
+                <span>92/100 · Janela crítica + cluster de entrega</span>
+              </div>
+              <div class="pos-line">
+                <span class="pos-label">Impacto estimado em rehandles:</span>
+                <span>-3 movimentos nas próximas 24h</span>
+              </div>
+              <div class="pos-line">
+                <span class="pos-label">Impacto em corredor:</span>
+                <span>Não gera bloqueio para unidades com janela posterior</span>
+              </div>
+              <div class="delta-line">
+                Sugestão criada a partir do cenário ativo no Digital Twin (Plano Predictive D-1).
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gate-footer">
+          <div class="footer-left">
+            Posição selecionada será enviada como alvo de pátio para a instrução de trabalho deste gate.
+          </div>
+          <div class="footer-right">
+            <div class="btn secondary" onclick="showView('digital')">Visualizar impacto no Digital Twin</div>
+            <div class="btn">Gerar Work Instruction e liberar gate</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div>
+</body>
+</html>
